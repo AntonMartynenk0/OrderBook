@@ -13,6 +13,7 @@ class ProcessorTest {
         Processor processor = new Processor();
         processor.processLine("u,99,0,ask");
         processor.processLine("u,98,50,ask");
+        processor.processLine("u,97,100,ask");
         processor.processLine("u,97,0,ask");
         var res = processor.processQuery(new String[]{"q", "best_ask"});
         assertEquals("98,50", res);

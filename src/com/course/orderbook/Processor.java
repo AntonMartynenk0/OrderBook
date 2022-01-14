@@ -1,5 +1,7 @@
 package com.course.orderbook;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -49,18 +51,20 @@ class Processor {
 
     public String processQuery(String[] values) {
         String output = "";
-        Integer price;
-        Integer quantity;
+        Integer price, quantity;
+        Map.Entry<Integer, Integer> entry;
         if (values.length == 2) {
             switch (values[1]) {
                 case "best_bid" -> {
-                    price = bidTreeMap.lastKey();
-                    quantity = bidTreeMap.get(bidTreeMap.lastKey());
+                    entry = bidTreeMap.lastEntry();
+                    price = entry.getKey();
+                    quantity = entry.getValue();
                     output = "%d,%d".formatted(price, quantity);
                 }
                 case "best_ask" -> {
-                    price = askTreeMap.firstKey();
-                    quantity = askTreeMap.get(askTreeMap.firstKey());
+                    entry = askTreeMap.firstEntry();
+                    price = entry.getKey();
+                    quantity = entry.getValue();
                     output = "%d,%d".formatted(price, quantity);
                 }
             }
@@ -84,24 +88,31 @@ class Processor {
         price = Integer.parseInt(values[1]);
         quantity = Integer.parseInt(values[2]);
         String typeOfOrder = values[3];
-        if (quantity > 0) {
-            switch (typeOfOrder) {
-                case "bid" -> {
-                    if (bidTreeMap.containsKey(price)) {
-                        bidTreeMap.put(price, bidTreeMap.get(price) + quantity);
-                    } else {
-                        bidTreeMap.put(price, quantity);
-                    }
+        switch (typeOfOrder) {
+            case "bid" -> {
+                if (bidTreeMap.containsKey(price) && quantity == 0) {
+                    bidTreeMap.remove(price);
+                } else if (quantity == 0) {
+                    return;
+                } else if (bidTreeMap.containsKey(price)) {
+                    bidTreeMap.put(price, bidTreeMap.get(price) + quantity);
+                } else {
+                    bidTreeMap.put(price, quantity);
                 }
-                case "ask" -> {
-                    if (askTreeMap.containsKey(price)) {
-                        askTreeMap.put(price, askTreeMap.get(price) + quantity);
-                    } else {
-                        askTreeMap.put(price, quantity);
-                    }
+            }
+            case "ask" -> {
+                if (askTreeMap.containsKey(price) && quantity == 0) {
+                    askTreeMap.remove(price);
+                } else if (quantity == 0) {
+                    return;
+                } else if (askTreeMap.containsKey(price)) {
+                    askTreeMap.put(price, askTreeMap.get(price) + quantity);
+                } else {
+                    askTreeMap.put(price, quantity);
                 }
             }
         }
+
     }
 
     public void processOrder(String[] values) {
@@ -135,7 +146,6 @@ class Processor {
                 } catch (NoSuchElementException e) {
                     System.out.println(e.getMessage());
                 }
-
             }
         }
     }
