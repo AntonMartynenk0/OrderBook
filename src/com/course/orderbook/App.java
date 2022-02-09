@@ -6,9 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.*;
 
+import static java.lang.System.*;
 import static java.nio.file.Files.*;
 
-public class Main {
+public class App {
     public static void main(String[] args) {
         var processor = new Processor();
         // for file processing (stream)
@@ -17,12 +18,8 @@ public class Main {
                     Files.lines(Path.of("input.txt")),
                     consume(writer));
         } catch (IOException e) {
-            handleIoException(e);
+            out.println(e.getMessage());
         }
-    }
-
-    static void handleIoException(Exception e) {
-        e.printStackTrace();
     }
 
     static Consumer<String> consume(BufferedWriter writer) {
@@ -31,7 +28,7 @@ public class Main {
                 writer.write(s);
                 writer.newLine();
             } catch (IOException e) {
-                handleIoException(e);
+                out.println(e.getMessage());
             }
         };
     }
